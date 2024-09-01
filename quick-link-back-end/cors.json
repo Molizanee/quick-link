@@ -1,0 +1,12 @@
+[
+	{
+		"origin": [
+			"http://localhost:3000",
+			"http://localhost:5173",
+			"https://quick-link.com"
+		],
+		"method": ["GET"],
+		"responseHeader": ["Content-Type"],
+		"maxAgeSeconds": 3600
+	}
+]
