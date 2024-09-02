@@ -1,6 +1,10 @@
 import { axiosInstance } from "./axios";
 
-export const uploadFile = async (file, ipAdress) => {
+type UploadFileResponse = {
+	id: string;
+};
+
+export const uploadFile = async (file: Blob, ipAdress: string) => {
 	try {
 		const formData = new FormData();
 		formData.append("file", file);
@@ -11,7 +15,7 @@ export const uploadFile = async (file, ipAdress) => {
 				"Content-Type": "multipart/form-data",
 			},
 		});
-		return response.data;
+		return response.data as UploadFileResponse;
 	} catch (error) {
 		console.error("Error uploading file:", error);
 		throw error;

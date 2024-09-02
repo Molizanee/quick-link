@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Rabbit } from "lucide-react";
-import { Input } from "./components/input";
+import { File, Rabbit } from "lucide-react";
+import { Input } from "@/components/input";
 import { Label } from "@/components/label";
-import { Button } from "./components/button";
-import { uploadFile } from "./api/upload-file"; // Assume this function is already created as per previous steps
+import { Button } from "@/components/button";
 import { z } from "zod";
-import { toast } from "sonner";
-import { getFile } from "./api/get-file";
+import { useIpAddress } from "@/hooks/useIpAddress";
+import { useFileDetails } from "@/hooks/useFileDetails";
+import { useFileUpload } from "@/hooks/useFileUpload";
+import { useFileDownload } from "@/hooks/useFileDownload";
 
 const uploadSchema = z.object({
 	file: z
@@ -24,54 +24,13 @@ const uploadSchema = z.object({
 		),
 });
 
-const InputFile = ({ register }: { register: any }) => {
-	return (
-		<div className="flex flex-col items-start gap-3 w-full max-w-sm">
-			<Label htmlFor="file" className="text-slate-100">
-				Select File
-			</Label>
-			<Input id="file" type="file" {...register("file")} />
-		</div>
-	);
-};
-
 type UploadSchema = z.infer<typeof uploadSchema>;
 
 export default function App() {
 	const id = new URLSearchParams(window.location.search).get("id");
+	const ipAddress = useIpAddress();
+	const fileDetails = useFileDetails(id || "");
 
-	const [ipAddress, setIpAddress] = useState("");
-	const [fileDetails, setFileDetails] = useState<any>({});
-
-	useEffect(() => {
-		const fetchIpAddress = async () => {
-			try {
-				const response = await fetch("https://api.ipify.org?format=json");
-				const data = await response.json();
-				setIpAddress(data.ip);
-			} catch (error) {
-				console.error("Error fetching the IP address:", error);
-			}
-		};
-
-		fetchIpAddress();
-	}, []);
-
-	useEffect(() => {
-		const fetchFileDetails = async () => {
-			try {
-				const fileDetailsResponse = await getFile(id);
-				setFileDetails(fileDetailsResponse);
-			} catch (error) {
-				console.error("Error getting file details:", error);
-			}
-		};
-		if (id) {
-			fetchFileDetails();
-		}
-	}, [id]);
-
-	const [fileId, setFileId] = useState<string | null>(null);
 	const {
 		register,
 		handleSubmit,
@@ -81,70 +40,8 @@ export default function App() {
 		resolver: zodResolver(uploadSchema),
 	});
 
-	const onSubmit = async (data: UploadSchema) => {
-		try {
-			const file = data.file[0];
-			const response = await uploadFile(file, ipAddress);
-			setFileId(response.id);
-			reset();
-			toast("File uploaded", {
-				action: <Button onClick={handleCopyLink}>Copy Link!</Button>,
-			});
-		} catch (error) {
-			console.error("Error uploading file:", error);
-			toast("Failed to upload file", { type: "error" });
-		}
-	};
-
-	const handleCopyLink = () => {
-		if (fileId) {
-			const currentUrl = window.location.href;
-			const fullUrl = `${currentUrl}?id=${fileId}`;
-			navigator.clipboard.writeText(fullUrl);
-			console.log("Link copied to clipboard:", fullUrl);
-		}
-	};
-
-	const handleDownloadFile = async () => {
-		try {
-			const fileDetails = await getFile(id); // Assuming getFile fetches the file details from your server
-			let fileName = fileDetails.file_name;
-
-			// Optional: If you want to rename the file by removing a part before an underscore
-			const underscoreIndex = fileName.indexOf("_");
-			if (underscoreIndex !== -1) {
-				fileName = fileName.substring(underscoreIndex + 1);
-			}
-
-			const fileUrl = fileDetails.file_url;
-
-			// Fetch the file as a Blob
-			const response = await fetch(fileUrl, {
-				mode: "cors", // Ensure CORS is handled if needed
-			});
-
-			if (!response.ok) {
-				throw new Error("Failed to download file");
-			}
-
-			const blob = await response.blob();
-
-			// Create a hidden anchor element to trigger the download
-			const url = window.URL.createObjectURL(blob);
-			const anchor = document.createElement("a");
-			anchor.href = url;
-			anchor.download = fileName;
-			anchor.style.display = "none"; // Hide the anchor element
-			document.body.appendChild(anchor);
-			anchor.click(); // Trigger the download
-			document.body.removeChild(anchor); // Clean up by removing the element
-			window.URL.revokeObjectURL(url); // Clean up the blob URL
-
-			console.log("File downloaded successfully.");
-		} catch (error) {
-			console.error("Error downloading the file:", error);
-		}
-	};
+	const { onSubmit, handleCopyLink } = useFileUpload(reset, ipAddress);
+	const handleDownloadFile = useFileDownload(id);
 
 	return (
 		<main className="bg-zinc-950 w-screen h-screen flex flex-col p-5 justify-between antialiased">
@@ -161,7 +58,19 @@ export default function App() {
 						onSubmit={handleSubmit(onSubmit)}
 						className="flex flex-col gap-5"
 					>
-						<InputFile register={register} />
+						<Label
+							htmlFor="file"
+							className="h-32 flex flex-col items-center justify-center border border-zinc-800 rounded-lg cursor-pointer transition-colors hover:border-gray-400"
+						>
+							<File size={24} color="white" />
+							<span className="text-white mt-2">Select or Drop file</span>
+							<Input
+								id="file"
+								type="file"
+								{...register("file")}
+								className="hidden"
+							/>
+						</Label>
 						{errors.file && (
 							<span className="text-red-500">{errors.file.message}</span>
 						)}
