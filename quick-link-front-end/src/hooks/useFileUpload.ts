@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { uploadFile } from "@/api/upload-file";
 import { toast } from "sonner";
-import { Button } from "@/components/button";
 
 type ResetFunction = () => void;
 
@@ -21,15 +20,32 @@ export function useFileUpload(reset: ResetFunction, ipAddress: string) {
 		}
 	};
 
+	const clearIdFromUrl = (setId: () => null) => {
+		const currentUrl = window.location.href;
+		const url = new URL(currentUrl);
+		url.searchParams.delete("id");
+		window.history.replaceState({}, "", url.toString());
+		setId(null);
+	};
+
 	const onSubmit = async (data: { file: FileList }) => {
 		try {
 			const file = data.file[0];
 			const response: UploadResponse = await uploadFile(file, ipAddress);
 			setFileId(response.id);
 			reset();
-			toast("File uploaded successfully", {
-				richColors: true,
-				action: () => handleCopyLink(),
+			toast.success("File uploaded successfully!", {
+				classNames: {
+					actionButton: "bg-emerald-500 text-slate-100",
+					icon: "text-emerald-500",
+					toast: "bg-zinc-950 border border-zinc-800",
+					title: "text-emerald-500",
+				},
+				duration: 10000,
+				action: {
+					label: "Copy Link",
+					onClick: handleCopyLink,
+				},
 			});
 		} catch (error) {
 			console.error("Error uploading file:", error);
@@ -37,5 +53,5 @@ export function useFileUpload(reset: ResetFunction, ipAddress: string) {
 		}
 	};
 
-	return { onSubmit, handleCopyLink };
+	return { onSubmit, handleCopyLink, clearIdFromUrl };
 }
