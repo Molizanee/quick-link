@@ -8,11 +8,11 @@ type GetFileResponse = {
 };
 
 export const getFile = async (id: string) => {
-	try {
-		const response = await axiosInstance.get(`/files/get-file/${id}`);
-		return response.data as GetFileResponse;
-	} catch (error) {
-		console.error("Error getting file:", error);
-		throw error;
+	const response = await axiosInstance.get<GetFileResponse>(
+		`/files/get-file/${id}`,
+	);
+	if (response.status === 204) {
+		return "File not found";
 	}
+	return response.data;
 };

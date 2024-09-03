@@ -1,6 +1,6 @@
 import express, { type Request, type Response } from "express";
 import fileRoutes from "./routes/file-routes";
-import deleteFiles from "./utils/cleanup-files";
+// import deleteFiles from "./utils/cleanup-files";
 
 import cors from "cors";
 const app = express();
@@ -17,7 +17,7 @@ app.use(
 app.use(express.json());
 app.use("/files", fileRoutes);
 
-setInterval(deleteFiles, 10 * 60 * 1000);
+// setInterval(deleteFiles, 10 * 60 * 1000);
 
 app.listen(PORT, () => {
 	console.log(`Server is running on http://localhost:${PORT}`);

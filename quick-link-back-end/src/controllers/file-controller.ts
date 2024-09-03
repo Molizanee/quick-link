@@ -74,7 +74,7 @@ export const getFile = async (req: Request, res: Response): Promise<void> => {
 		const doc = await db.collection("files").doc(id).get();
 
 		if (!doc.exists) {
-			res.status(404).send({ message: "File not found." });
+			res.status(204).send({ message: "File not found." });
 			return;
 		}
 

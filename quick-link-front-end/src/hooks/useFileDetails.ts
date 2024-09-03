@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
 import { getFile } from "@/api/get-file";
+import { useEffect, useState } from "react";
 
 type FileDetails = {
 	id: string;
