@@ -113,10 +113,13 @@ export const UploadFileForm = () => {
 
 	return (
 		<div className="flex flex-col w-[500px] gap-3 self-center">
-			<span className="text-slate-100 self-center text-sm">
-				Quick Link currently supports files up to a{" "}
-				<span className="font-semibold">maximum size of 10MB</span>
-			</span>
+			{!id && (
+				<span className="text-slate-100 self-center text-sm">
+					Quick Link currently supports files up to a{" "}
+					<span className="font-semibold">maximum size of 10MB</span>
+				</span>
+			)}
+
 			<div className="border border-zinc-800 p-5 flex flex-col gap-5 rounded-lg">
 				{!id ? (
 					<form

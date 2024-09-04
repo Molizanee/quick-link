@@ -12,12 +12,14 @@ export function useFileUpload(reset: ResetFunction, ipAddress: string) {
 	const [fileId, setFileId] = useState<string | null>(null);
 
 	const handleCopyLink = () => {
+		console.log("Copying link to clipboard...");
 		if (fileId) {
 			const currentUrl = window.location.href;
 			const fullUrl = `${currentUrl}?id=${fileId}`;
 			navigator.clipboard
 				.writeText(fullUrl)
 				.then(() => {
+					alert(fullUrl);
 					console.log("Link copied to clipboard:", fullUrl);
 				})
 				.catch((error) => {
