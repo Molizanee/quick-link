@@ -1,3 +1,5 @@
+import { TermsAndConditions } from "@/components/terms-and-conditions";
+
 export const Footer = () => {
 	return (
 		<div className="text-slate-100 text-sm flex justify-between">
@@ -10,7 +12,7 @@ export const Footer = () => {
 					David Molizane
 				</a>
 			</span>
-			<span className="font-semibold">Terms and Conditions</span>
+			<TermsAndConditions />
 		</div>
 	);
 };
