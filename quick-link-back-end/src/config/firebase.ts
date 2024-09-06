@@ -1,5 +1,3 @@
-// src/config/firebase.ts
-
 import { initializeApp, cert } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
 import { getStorage } from "firebase-admin/storage";
@@ -19,10 +17,11 @@ if (!serviceAccountKeys || !bucketUrl) {
 
 const serviceAccount = JSON.parse(serviceAccountKeys);
 
-initializeApp({
+const app = initializeApp({
 	credential: cert(serviceAccount),
 	storageBucket: bucketUrl,
 });
 
 export const db = getFirestore();
 export const storage = getStorage();
+export const bucket = storage.bucket();

@@ -1,16 +1,14 @@
 import { Router } from "express";
 import {
-	createFile,
-	// deleteFile,
-	downloadFile,
-	getFileDetails,
-} from "../controllers/file-controller";
+	uploadFileController,
+	downloadFileController,
+} from "@/controllers/file-controller";
+import multer from "multer";
 
+const upload = multer({ storage: multer.memoryStorage() });
 const router = Router();
 
-router.post("/create-file", createFile);
-router.get("/get-file/:id", getFileDetails);
-router.get("/download-file/:id", downloadFile);
-// router.post("/delete-file/:id", deleteFile);
+router.post("/upload", upload.single("file"), uploadFileController);
+router.get("/download/:id", downloadFileController);
 
 export default router;
