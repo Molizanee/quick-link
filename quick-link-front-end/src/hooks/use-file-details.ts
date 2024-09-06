@@ -9,7 +9,7 @@ type FileDetails = {
 	ip_address: string;
 };
 
-export function useFileDetails(id: string) {
+export const useFileDetails = (id: string) => {
 	const [fileDetails, setFileDetails] = useState({});
 
 	useEffect(() => {
@@ -27,4 +27,4 @@ export function useFileDetails(id: string) {
 	}, [id]);
 
 	return fileDetails as FileDetails;
-}
+};
